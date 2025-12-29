@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: techchallenge-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: tech_challenge
+      MYSQL_USER: tech
+      MYSQL_PASSWORD: tech123
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
