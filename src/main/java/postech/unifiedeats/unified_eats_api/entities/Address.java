@@ -8,11 +8,11 @@ import lombok.Setter;
 @Setter
 @Embeddable
 public class Address {
-    private String zipCode;        // cep
-    private String street;         // logradouro
-    private String number;         // numero
-    private String complement;     // complemento
-    private String district;       // bairro
-    private String city;           // cidade
-    private String state;          // uf
+    private String zipCode;
+    private String street;
+    private String number;
+    private String complement;
+    private String district;
+    private String city;
+    private String state;
 }
