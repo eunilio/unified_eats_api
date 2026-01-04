@@ -2,6 +2,7 @@ package postech.unifiedeats.unified_eats_api.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import postech.unifiedeats.unified_eats_api.enums.UserType;
 
@@ -9,8 +10,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email"), @UniqueConstraint(columnNames = "login")})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
