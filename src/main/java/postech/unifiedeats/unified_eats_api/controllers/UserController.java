@@ -9,6 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import postech.unifiedeats.unified_eats_api.dtos.ChangePasswordDTO;
 import postech.unifiedeats.unified_eats_api.dtos.UserRequestDTO;
 import postech.unifiedeats.unified_eats_api.dtos.UserResponseDTO;
+import postech.unifiedeats.unified_eats_api.dtos.UserUpdateRequestDTO;
 import postech.unifiedeats.unified_eats_api.services.AuthService;
 import postech.unifiedeats.unified_eats_api.services.UserService;
 
@@ -25,9 +26,9 @@ public class UserController {
     private final AuthService authService;
 
     @GetMapping
-    public List<UserResponseDTO> findAll() {
+    public ResponseEntity<List<UserResponseDTO>> findAll() {
         log.info("GET -> /v1/users");
-        return userService.findAll();
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -37,9 +38,16 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<UserResponseDTO>> findUserByName(@RequestParam("name") String name) {
+        log.info("GET /v1/users/search?name={}", name);
+        var users = userService.findByName(name);
+        return ResponseEntity.ok(users);
+    }
+
     @PostMapping
     public ResponseEntity<Void> saveUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
-        log.info(" POST -> /users");
+        log.info(" POST -> /v1/users");
         long id = userService.save(userRequestDTO);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
@@ -50,6 +58,20 @@ public class UserController {
     public ResponseEntity<Void> password(@PathVariable("id") Long id, @Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
         log.info("PATCH -> /v1/users/{}/password", id);
         authService.changePassword(id, changePasswordDTO);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateUser(@PathVariable("id") Long id, @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+        log.info("PUT -> /v1/users/{}", id);
+        userService.update(userUpdateRequestDTO, id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+        log.info("DELETE /v1/users/" + id);
+        userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

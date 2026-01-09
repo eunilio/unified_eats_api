@@ -8,11 +8,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import postech.unifiedeats.unified_eats_api.services.exceptions.InvalidCredentialsException;
+import postech.unifiedeats.unified_eats_api.services.exceptions.InvalidParameterException;
 import postech.unifiedeats.unified_eats_api.services.exceptions.UserAlreadyExistsException;
 import postech.unifiedeats.unified_eats_api.services.exceptions.UserNotFoundException;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -59,11 +62,29 @@ public class ControllerExceptionHandler {
         problemDetail.setType(URI.create("urn:problem:validation-error"));
         problemDetail.setInstance(URI.create(request.getRequestURI()));
 
-        Map<String, String> errors = new HashMap<>();
+        Map<String, List<String>> errors = new HashMap<>();
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
-            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+            errors
+                    .computeIfAbsent(fieldError.getField(), key -> new ArrayList<>())
+                    .add(fieldError.getDefaultMessage());
         }
+
+        problemDetail.setProperty("errors", errors);
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(InvalidParameterException.class)
+    public ProblemDetail handleInvalidCredentialsException(InvalidParameterException e, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Parâmetro inválido");
+
+        problemDetail.setTitle("Erro de validação");
+        problemDetail.setType(URI.create("urn:problem:validation-error"));
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+        Map<String, List<String>> errors = new HashMap<>();
+        errors.put(e.getParamName(), List.of(e.getMessage()));
 
         problemDetail.setProperty("errors", errors);
 

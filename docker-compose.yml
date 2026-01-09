@@ -10,6 +10,7 @@ services:
       MYSQL_USER: tech
       MYSQL_PASSWORD: tech123
       MYSQL_ROOT_PASSWORD: root123
+      TZ: America/Sao_Paulo
     ports:
       - "3307:3306"
     volumes:
