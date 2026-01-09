@@ -2,6 +2,7 @@ package postech.unifiedeats.unified_eats_api.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import postech.unifiedeats.unified_eats_api.dtos.ChangePasswordDTO;
 import postech.unifiedeats.unified_eats_api.dtos.LoginRequestDTO;
 import postech.unifiedeats.unified_eats_api.dtos.LoginResponseDTO;
@@ -11,6 +12,7 @@ import postech.unifiedeats.unified_eats_api.services.exceptions.UserNotFoundExce
 
 import java.time.LocalDateTime;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class AuthService {
@@ -32,6 +34,5 @@ public class AuthService {
 
         user.setPassword(changePasswordDTO.newPassword());
         user.setLastUpdated(LocalDateTime.now());
-        userRepository.save(user);
     }
 }

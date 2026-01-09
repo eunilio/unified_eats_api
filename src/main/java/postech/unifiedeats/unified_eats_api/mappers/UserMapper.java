@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import postech.unifiedeats.unified_eats_api.dtos.AddressDTO;
 import postech.unifiedeats.unified_eats_api.dtos.UserRequestDTO;
 import postech.unifiedeats.unified_eats_api.dtos.UserResponseDTO;
+import postech.unifiedeats.unified_eats_api.dtos.UserUpdateRequestDTO;
 import postech.unifiedeats.unified_eats_api.entities.Address;
 import postech.unifiedeats.unified_eats_api.entities.User;
 
@@ -44,5 +45,23 @@ public class UserMapper {
 
     public List<UserResponseDTO> toResponseList(List<User> users) {
         return users.stream().map(this::toResponse).toList();
+    }
+
+    public User toUpdateEntity(UserUpdateRequestDTO dto, User user) {
+        user.setName(dto.name());
+        user.setEmail(dto.email());
+        user.setLogin(dto.login());
+        user.setLastUpdated(LocalDateTime.now());
+        user.setType(dto.type());
+
+        user.getAddress().setZipCode(dto.addressDTO().zipCode());
+        user.getAddress().setStreet(dto.addressDTO().street());
+        user.getAddress().setNumber(dto.addressDTO().number());
+        user.getAddress().setComplement(dto.addressDTO().complement());
+        user.getAddress().setDistrict(dto.addressDTO().district());
+        user.getAddress().setCity(dto.addressDTO().city());
+        user.getAddress().setState(dto.addressDTO().state());
+
+        return user;
     }
 }
