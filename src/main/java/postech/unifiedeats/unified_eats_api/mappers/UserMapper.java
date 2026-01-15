@@ -14,54 +14,55 @@ import java.util.List;
 @Component
 public class UserMapper {
 
-    public User toEntity(UserRequestDTO userRequestDTO) {
+    public User toEntity(UserRequestDTO userRequestDTO, LocalDateTime localDateTime) {
         var user = new User();
         user.setName(userRequestDTO.name());
         user.setEmail(userRequestDTO.email());
         user.setLogin(userRequestDTO.login());
         user.setPassword(userRequestDTO.password());
-        user.setLastUpdated(LocalDateTime.now());
+        user.setLastUpdated(localDateTime);
         user.setType(userRequestDTO.type());
 
-        var address = new Address();
-        address.setZipCode(userRequestDTO.addressDTO().zipCode());
-        address.setStreet(userRequestDTO.addressDTO().street());
-        address.setNumber(userRequestDTO.addressDTO().number());
-        address.setComplement(userRequestDTO.addressDTO().complement());
-        address.setDistrict(userRequestDTO.addressDTO().district());
-        address.setCity(userRequestDTO.addressDTO().city());
-        address.setState(userRequestDTO.addressDTO().state());
-
-        user.setAddress(address);
+        user.setAddress(toAddressEntity(userRequestDTO.addressDTO(), null));
 
         return user;
     }
 
     public UserResponseDTO toResponse(User user) {
-        AddressDTO addressDTO = new AddressDTO(user.getAddress().getZipCode(), user.getAddress().getStreet(), user.getAddress().getNumber(), user.getAddress().getComplement(), user.getAddress().getDistrict(), user.getAddress().getCity(), user.getAddress().getState());
-
-        return new UserResponseDTO(user.getName(), user.getEmail(), user.getLogin(), addressDTO, user.getType());
+        return new UserResponseDTO(user.getName(), user.getEmail(), user.getLogin(), toAddressDTO(user.getAddress()), user.getType());
     }
 
     public List<UserResponseDTO> toResponseList(List<User> users) {
         return users.stream().map(this::toResponse).toList();
     }
 
-    public User toUpdateEntity(UserUpdateRequestDTO dto, User user) {
+    public User toUpdateEntity(UserUpdateRequestDTO dto, User user, LocalDateTime localDateTime) {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setLogin(dto.login());
-        user.setLastUpdated(LocalDateTime.now());
+        user.setLastUpdated(localDateTime);
         user.setType(dto.type());
 
-        user.getAddress().setZipCode(dto.addressDTO().zipCode());
-        user.getAddress().setStreet(dto.addressDTO().street());
-        user.getAddress().setNumber(dto.addressDTO().number());
-        user.getAddress().setComplement(dto.addressDTO().complement());
-        user.getAddress().setDistrict(dto.addressDTO().district());
-        user.getAddress().setCity(dto.addressDTO().city());
-        user.getAddress().setState(dto.addressDTO().state());
+        user.setAddress(toAddressEntity(dto.addressDTO(), user.getAddress()));
 
         return user;
+    }
+
+    private Address toAddressEntity(AddressDTO dto, Address address) {
+        if (address == null) address = new Address();
+
+        address.setZipCode(dto.zipCode());
+        address.setStreet(dto.street());
+        address.setNumber(dto.number());
+        address.setComplement(dto.complement());
+        address.setDistrict(dto.district());
+        address.setCity(dto.city());
+        address.setState(dto.state());
+
+        return address;
+    }
+
+    private AddressDTO toAddressDTO(Address address) {
+        return new AddressDTO(address.getZipCode(), address.getStreet(), address.getNumber(), address.getComplement(), address.getDistrict(), address.getCity(), address.getState());
     }
 }
