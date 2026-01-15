@@ -1,38 +1,47 @@
-package postech.unifiedeats.unified_eats_api.services;
+    package postech.unifiedeats.unified_eats_api.services;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import postech.unifiedeats.unified_eats_api.dtos.ChangePasswordDTO;
-import postech.unifiedeats.unified_eats_api.dtos.LoginRequestDTO;
-import postech.unifiedeats.unified_eats_api.dtos.LoginResponseDTO;
-import postech.unifiedeats.unified_eats_api.repositories.UserRepository;
-import postech.unifiedeats.unified_eats_api.services.exceptions.InvalidCredentialsException;
-import postech.unifiedeats.unified_eats_api.services.exceptions.UserNotFoundException;
+    import lombok.RequiredArgsConstructor;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import postech.unifiedeats.unified_eats_api.dtos.ChangePasswordDTO;
+    import postech.unifiedeats.unified_eats_api.dtos.LoginRequestDTO;
+    import postech.unifiedeats.unified_eats_api.dtos.LoginResponseDTO;
+    import postech.unifiedeats.unified_eats_api.entities.User;
+    import postech.unifiedeats.unified_eats_api.repositories.UserRepository;
+    import postech.unifiedeats.unified_eats_api.services.exceptions.InvalidCredentialsException;
+    import postech.unifiedeats.unified_eats_api.services.exceptions.UserNotFoundException;
 
-import java.time.LocalDateTime;
+    import java.time.LocalDateTime;
 
-@Transactional
-@RequiredArgsConstructor
-@Service
-public class AuthService {
+    @RequiredArgsConstructor
+    @Service
+    public class AuthService {
 
-    private final UserRepository userRepository;
+        private final UserRepository userRepository;
 
-    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
-        var user = userRepository.findByLoginAndPassword(loginRequestDTO.login(), loginRequestDTO.password()).orElseThrow(() -> new InvalidCredentialsException("Login ou senha inválidos"));
+        public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
+            var user = userRepository.findByLogin(loginRequestDTO.login()).orElseThrow(() -> new InvalidCredentialsException("Login ou senha inválidos"));
 
-        return new LoginResponseDTO(user.getName(), user.getType());
-    }
+            if(!user.getPassword().equals(loginRequestDTO.password())) {
+                throw new InvalidCredentialsException("Login ou senha inválidos");
+            }
 
-    public void changePassword(Long id, ChangePasswordDTO changePasswordDTO) {
-        var user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
-
-        if (!user.getPassword().equals(changePasswordDTO.oldPassword())){
-            throw new InvalidCredentialsException("Senha atual inválida");
+            return new LoginResponseDTO(user.getName(), user.getType());
         }
 
-        user.setPassword(changePasswordDTO.newPassword());
-        user.setLastUpdated(LocalDateTime.now());
+        @Transactional
+        public void changePassword(Long id, ChangePasswordDTO changePasswordDTO) {
+            var user = getUserOrThrow(id);
+
+            if (!user.getPassword().equals(changePasswordDTO.oldPassword())){
+                throw new InvalidCredentialsException("Senha atual inválida");
+            }
+
+            user.setPassword(changePasswordDTO.newPassword());
+            user.setLastUpdated(LocalDateTime.now());
+        }
+
+        private User getUserOrThrow(Long id) {
+            return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+        }
     }
-}
