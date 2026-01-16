@@ -31,3 +31,18 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.local
+.env.* 
+
+# Docker artifacts
+*.tar

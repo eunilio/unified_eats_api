@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   mysql:
     image: mysql:8.4
@@ -15,6 +13,27 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  api:
+    build: .
+    container_name: unified-eats-api
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tech_challenge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo&useUnicode=true&characterEncoding=utf8
+      SPRING_DATASOURCE_USERNAME: tech
+      SPRING_DATASOURCE_PASSWORD: tech123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
 volumes:
   mysql_data:
