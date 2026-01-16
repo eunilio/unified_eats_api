@@ -1,4 +1,4 @@
-INSERT INTO users
+INSERT IGNORE INTO users
 (name, email, login, password, type, last_updated, street, number, district, city, state, zip_code, complement)
 VALUES
     (
@@ -17,7 +17,7 @@ VALUES
         'Apto 12'
     );
 
-INSERT INTO users
+INSERT IGNORE INTO users
 (name, email, login, password, type, last_updated, street, number, district, city, state, zip_code, complement)
 VALUES
     (
