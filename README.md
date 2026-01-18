@@ -59,7 +59,9 @@ As configurações estão definidas no arquivo `docker-compose.yml`.
 A collection do Postman está disponível na pasta:
 
 ```
-postman/unifiedeats.postman_collection.json
+postman/
+  unifiedeats.postman_collection.json
+  local.postman_environment.json
 ```
 
 Ela contém exemplos de:
